@@ -24,8 +24,7 @@
         h    (q/height)
         cell-h (/ h (count cells))
         cell-w (/ w (count (first cells)))
-        inner-r (* 0.33 cell-w)
-        ]
+        inner-r (* 0.33 cell-w)]
     (q/background 255)
     (q/translate (* 0.5 cell-w) (* 0.5 cell-h))
     (doseq [row cells]
@@ -39,14 +38,11 @@
           (q/ellipse 0 0 inner-r inner-r)
           (q/translate 0 cell-w)))
       (q/pop-matrix)
-      (q/translate cell-h 0))
-    )
-  )
+      (q/translate cell-h 0))))
 
 (q/defsketch circle-to-square
   :title      "circle to square... and back again"
   :size       [800 800]
   :setup      setup
   :draw       draw
-  :middleware [m/fun-mode]
-  )
+  :middleware [m/fun-mode])
