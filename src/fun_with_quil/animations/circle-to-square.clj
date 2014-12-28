@@ -2,15 +2,15 @@
   (:require [quil.core :as q :include-macros true]
             [quil.middleware :as m]))
 
-(defn make-cells [rows cols]
+(defn make-cells [m n]
   (into []
-    (for [_ (range cols)]
+    (for [_ (range m)]
       (into []
-        (for [_ (range rows)]
+        (for [_ (range n)]
           {:dθ (q/random 180)})))))
 
 (defn setup []
-  (let [rows 12 cols 18]
+  (let [rows 12 cols 12]
     (q/stroke-weight 4)
     (q/ellipse-mode :center)
     (q/rect-mode :center)
@@ -45,7 +45,7 @@
 
 (q/defsketch circle-to-square
   :title      "circle to square... and back again"
-  :size       [1440 800]
+  :size       [800 800]
   :setup      setup
   :draw       draw
   :middleware [m/fun-mode]
