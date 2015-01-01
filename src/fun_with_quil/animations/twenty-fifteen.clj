@@ -8,11 +8,7 @@
     (q/background 0)
     (q/no-stroke)
     (q/color-mode :hsb)
-    (q/translate (* 0.5 w) (* 0.5 h))
-;    (q/camera 0 0 2000
-;              0 0 0
-;              0 1 0)
-  ))
+    (q/translate (* 0.5 w) (* 0.5 h))))
 
 (defn digit [r {absolute-coords :absolute-coords
                 sphere-coords :sphere-coords}]
@@ -82,18 +78,13 @@
                                [0 4 0 40]
                                [3 4 0 40]
                                [1 5 0 50]
-                               [2 5 0 50]]}
-        ]
+                               [2 5 0 50]]}]
     (q/background 0)
     (q/camera camera-x 0 camera-z
               0 0 0
               0 1 0)
-    (digit r two)
-    (digit r zero)
-    (digit r one)
-    (digit r five)
-    )
-  )
+    (doseq [n [two zero one five]]
+      (digit r n))))
 
 (q/defsketch twenty-fifteen
   :title "2015"
