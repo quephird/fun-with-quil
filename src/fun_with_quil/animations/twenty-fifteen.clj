@@ -17,7 +17,6 @@
         r   50
         camera-x (* 2000 (q/sin (q/radians fc)))
         camera-z (* 2000 (q/cos (q/radians fc)))
-        light-h (q/map-range (q/sin (q/radians (* 0.1 fc))) -1 1 0 255)
         two [[0 1 1 0]
              [1 0 0 1]
              [0 0 0 1]
