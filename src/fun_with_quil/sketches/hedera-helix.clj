@@ -16,30 +16,44 @@
       (q/pop-matrix)))))
 
 (defn leaf [s c x y]
-  (let [unscaled-vs [[0 0]
-                     [-50 30]
-                     [-100 20]
-                     [-90 -10]
-                     [-125 -105]
-                     [-50 -105]
-                     [0 -180]
-                     [50 -105]
-                     [125 -105]
-                     [90 -10]
-                     [100 20]
-                     [50 30]]
-        leaf-vs      (map (fn[v] (map #(* s %) v)) unscaled-vs)]
-    (q/no-stroke)
+  (let [stem-length       (* s 40)
+        unscaled-vertices [[0 20 -50 30 -50 30]
+                           [-50 30 -100 40 -100 20]
+                           [-100 20 -100 0 -90 -10]
+                           [-110 -10 -130 -105 -125 -105]
+                           [-125 -115 -50 -115 -50 -105]
+                           [-55 -110 0 -190 0 -180]
+                           [0 -190 55 -110 50 -105]
+                           [50 -115 125 -115 125 -105]
+                           [130 -105 100 -10 90 -10]
+                           [100 0 100 20 100 20]
+                           [100 40 50 30 50 30]
+                           [50 30 0 20 0 0]]
+        scaled-vertices    (map (fn[v] (map #(* s %) v)) unscaled-vertices)
+        vein-vertices  (->> scaled-vertices
+                         (take (dec (count unscaled-vertices)))
+                          (drop 1)
+                          (take-nth 2)
+                          (map #(drop 4 %)))]
     (q/push-matrix)
     (q/translate x y)
+    (q/stroke-weight 3)
+    (q/stroke 139 119 101)
+    (q/line 0 0 0 (- stem-length))
+
+    (q/no-stroke)
     (apply q/fill c)
+    (q/translate 0 (- stem-length))
     (q/begin-shape)
-    (doseq [v leaf-vs]
-      (apply q/vertex v))
+    (q/vertex 0 0)
+    (doseq [v scaled-vertices]
+      (apply q/bezier-vertex v))
     (q/end-shape :close)
-        (doseq [[vein-x vein-y] (drop 1 (take-nth 2 leaf-vs))]
+
+    (doseq [[vein-x vein-y] vein-vertices]
       (vein 2 vein-x vein-y))
-    (q/pop-matrix)))
+    (q/pop-matrix)
+    ))
 
 (defn branch [n x y]
   (let [leaf-count n
@@ -49,7 +63,7 @@
     (q/rotate (q/radians branch-θ))
     (q/stroke-weight 3)
     (q/stroke 139 119 101)
-    (q/line 0 0 0 (* n n 6))
+    (q/line 0 0 0 (* n n 7))
     (doseq [i (range n 0 -1)]
       (let [s     (* 0.1 i)
             c     [0 (q/random 50 100) 0]
@@ -70,15 +84,12 @@
 (defn draw []
   (let [fc (q/frame-count)
         w  (q/width)
-        h  (q/height)]
+        h  (q/height)
+        n  8]
     (q/background 0)
 
-    (doseq [[n x y] [[10 100 0]
-                     [8 400 0]
-                     [7 700 0]
-                     [11 1000 0]
-                     [9 1300 0]]]
-      (branch n x y))
+    (dotimes [i n]
+      (branch (int (q/random 8 12)) (+ 50 (* i (/ w n)))  (q/random -100 0)))
     (q/save "hedera-helix.png")))
 
 (q/defsketch hedera-helix
