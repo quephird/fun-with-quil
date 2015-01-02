@@ -72,12 +72,14 @@
         w  (q/width)
         h  (q/height)]
     (q/background 0)
-    (branch 10 100 0)
-    (branch 8 400 0)
-    (branch 7 700 0)
-    (branch 11 1000 0)
-    (branch 9 1300 0))
-    (q/save "hedera-helix.png"))
+
+    (doseq [[n x y] [[10 100 0]
+                     [8 400 0]
+                     [7 700 0]
+                     [11 1000 0]
+                     [9 1300 0]]]
+      (branch n x y))
+    (q/save "hedera-helix.png")))
 
 (q/defsketch hedera-helix
   :title "hedera-helix"
