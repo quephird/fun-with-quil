@@ -10,19 +10,6 @@
     (q/color-mode :hsb)
     (q/translate (* 0.5 w) (* 0.5 h))))
 
-(defn digit [r {absolute-coords :absolute-coords
-                sphere-coords :sphere-coords}]
-    (q/push-matrix)
-    (apply q/translate (map #(* 2 r %) absolute-coords))
-    (doseq [[x y z h] sphere-coords]
-      (q/push-matrix)
-      (apply q/translate (map #(* 2 r %) [x y z]))
-      (q/fill h 255 255)
-      (q/sphere r)
-      (q/pop-matrix))
-    (q/pop-matrix))
-
-
 (defn draw []
   (let [fc (q/frame-count)
         w  (q/width)
@@ -30,64 +17,59 @@
         r   50
         camera-x (* 2000 (q/sin (q/radians fc)))
         camera-z (* 2000 (q/cos (q/radians fc)))
-        two {:absolute-coords [-8 -3 0]
-             :sphere-coords   [[1 0 0 0]
-                               [2 0 0 0]
-                               [0 1 0 10]
-                               [3 1 0 10]
-                               [3 2 0 20]
-                               [2 3 0 30]
-                               [1 4 0 40]
-                               [0 5 0 50]
-                               [1 5 0 50]
-                               [2 5 0 50]
-                               [3 5 0 50]]}
-        zero {:absolute-coords [-3 -3 0]
-             :sphere-coords   [[1 0 0 0]
-                               [2 0 0 0]
-                               [0 1 0 10]
-                               [3 1 0 10]
-                               [0 2 0 20]
-                               [3 2 0 20]
-                               [0 3 0 30]
-                               [3 3 0 30]
-                               [0 4 0 40]
-                               [3 4 0 40]
-                               [1 5 0 50]
-                               [2 5 0 50]]}
-        one {:absolute-coords [2 -3 0]
-             :sphere-coords   [[2 0 0 0]
-                               [1 1 0 10]
-                               [2 1 0 10]
-                               [2 2 0 20]
-                               [2 3 0 30]
-                               [2 4 0 40]
-                               [1 5 0 50]
-                               [2 5 0 50]
-                               [3 5 0 50]]}
-        five {:absolute-coords [7 -3 0]
-             :sphere-coords   [[0 0 0 0]
-                               [1 0 0 0]
-                               [2 0 0 0]
-                               [3 0 0 0]
-                               [0 1 0 10]
-                               [0 2 0 20]
-                               [1 2 0 20]
-                               [2 2 0 20]
-                               [3 3 0 30]
-                               [0 4 0 40]
-                               [3 4 0 40]
-                               [1 5 0 50]
-                               [2 5 0 50]]}]
+        light-h (q/map-range (q/sin (q/radians (* 0.1 fc))) -1 1 0 255)
+        two [[0 1 1 0]
+             [1 0 0 1]
+             [0 0 0 1]
+             [0 0 1 0]
+             [0 1 0 0]
+             [1 1 1 1]]
+        zero [[0 1 1 0]
+              [1 0 0 1]
+              [1 0 0 1]
+              [1 0 0 1]
+              [1 0 0 1]
+              [0 1 1 0]]
+        one [[0 1 0]
+             [1 1 0]
+             [0 1 0]
+             [0 1 0]
+             [0 1 0]
+             [1 1 1]]
+        five [[1 1 1 1]
+              [1 0 0 0]
+              [1 1 1 0]
+              [0 0 0 1]
+              [1 0 0 1]
+              [0 1 1 0]]
+        twenty-fifteen  (for [i (range 6)]
+                          (->> [two zero one five]
+                            (map #(nth % i))
+                            (interpose [0])
+                            (apply concat)))]
     (q/background 0)
+    (q/point-light 0 0 255
+                   0 -1000 camera-z)
     (q/camera camera-x 0 camera-z
               0 0 0
               0 1 0)
-    (doseq [n [two zero one five]]
-      (digit r n))))
+
+    (q/push-matrix)
+    (q/translate (* -17 r) (* -5 r) 0)
+    (doseq [[y pixel-row] (map-indexed vector twenty-fifteen)]
+      (q/push-matrix)
+      (doseq [[x pixel] (map-indexed vector pixel-row)]
+        (if (= pixel 1)
+          (let [h (q/map-range (mod (+ x y (* 0.5 fc)) 24) 0 24 0 255)]
+            (q/fill h 255 255)
+            (q/sphere r)))
+        (q/translate (* 2 r) 0 0))
+      (q/pop-matrix)
+      (q/translate 0 (* 2 r) 0))
+    (q/pop-matrix)))
 
 (q/defsketch twenty-fifteen
-  :title "2015"
+  :title "HAPPY NEW YEAR 2015!!!"
   :setup setup
   :draw draw
   :renderer :p3d
