@@ -1,6 +1,8 @@
 (ns fun-with-quil.sketches.hedera-helix
   (:require [quil.core :as q :include-macros true]))
 
+; TODO: Add curves to each vein segment
+;       Add randomization
 (defn vein [n x y]
   (q/stroke-weight n)
   (q/stroke 229 255 204)
@@ -15,6 +17,9 @@
       (vein (dec n) new-x new-y)
       (q/pop-matrix)))))
 
+; TODO: Add curves to stem
+;       Leaves should be a bit curvier
+;       Add randomization to vertices
 (defn leaf [s c x y]
   (let [stem-length       (* s 40)
         unscaled-vertices [[0 20 -50 30 -50 30]
@@ -29,7 +34,7 @@
                            [100 0 100 20 100 20]
                            [100 40 50 30 50 30]
                            [50 30 0 20 0 0]]
-        scaled-vertices    (map (fn[v] (map #(* s %) v)) unscaled-vertices)
+        scaled-vertices    (map (fn[v] (map #(* s (+ (q/random -10 10) %)) v)) unscaled-vertices)
         vein-vertices  (->> scaled-vertices
                          (take (dec (count unscaled-vertices)))
                           (drop 1)
@@ -41,10 +46,11 @@
     (q/stroke 139 119 101)
     (q/line 0 0 0 (- stem-length))
 
-    (q/no-stroke)
-    (apply q/fill c)
+    (q/stroke-weight 2)
+    (apply q/stroke (map #(* 0.5 %) c))
     (q/translate 0 (- stem-length))
     (q/begin-shape)
+    (apply q/fill c)
     (q/vertex 0 0)
     (doseq [v scaled-vertices]
       (apply q/bezier-vertex v))
@@ -88,6 +94,7 @@
         n  8]
     (q/background 0)
 
+;    (leaf 2 [0 127 0] 700 500)))
     (dotimes [i n]
       (branch (int (q/random 8 12)) (+ 50 (* i (/ w n)))  (q/random -100 0)))
     (q/save "hedera-helix.png")))
