@@ -20,6 +20,7 @@
 ; TODO: Leaves should be a bit curvier
 (defn leaf [s c x y]
   (let [petiole-length     (* s 40)
+        shade-count        20
         curve-dir          ([-1 1] (rand-int 2))
         petiole-dx1        (* s curve-dir (q/random 40))
         petiole-dx2        (* s curve-dir (q/random 40))
@@ -49,17 +50,18 @@
              0 0
              0 (- petiole-length)
              petiole-dx2 0)
-;    (q/line 0 0 0 (- petiole-length))
 
-    (q/stroke-weight 1)
-    (apply q/stroke (map #(* 0.5 %) c))
+    (q/no-stroke)
     (q/translate 0 (- petiole-length))
-    (q/begin-shape)
-    (apply q/fill c)
-    (q/vertex 0 0)
-    (doseq [v scaled-vertices]
-      (apply q/bezier-vertex v))
-    (q/end-shape :close)
+
+    ; This is what creates a sort of gradient effect.
+    (dotimes [i shade-count]
+      (q/begin-shape)
+      (apply q/fill (map #(* (q/map-range i 0 shade-count 1 0) %) c))
+      (q/vertex 0 0)
+      (doseq [v scaled-vertices]
+        (apply q/bezier-vertex (map #(* (q/map-range i 0 shade-count 1 0) %) v)))
+      (q/end-shape :close))
 
     (doseq [[vein-x vein-y] vein-vertices]
       (vein 2 s vein-x vein-y))
@@ -98,13 +100,12 @@
         n  8]
     (q/background 0)
 
-;    (leaf 2 [0 127 0] 700 500)))
     (dotimes [i n]
-      (branch (int (q/random 8 12)) (+ 50 (* i (/ w n)))  (q/random -100 0)))
+      (branch (int (q/random 10 14)) (+ 50 (* i (/ w n)))  (q/random -100 0)))
     (q/save "hedera-helix.png")))
 
 (q/defsketch hedera-helix
   :title "hedera-helix"
   :setup setup
   :draw draw
-  :size [1440 800])
+  :size [1920 1080])
