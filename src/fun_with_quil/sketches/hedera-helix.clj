@@ -3,8 +3,8 @@
 
 ; TODO: Add curves to each vein segment
 ;       Add randomization
-(defn vein [n x y]
-  (q/stroke-weight n)
+(defn vein [n s x y]
+  (q/stroke-weight (* s n))
   (q/stroke 229 255 204)
   (q/line 0 0 x y)
   (if (> n 0)
@@ -14,14 +14,15 @@
       (q/push-matrix)
       (q/translate new-x new-y)
       (q/rotate (q/radians t))
-      (vein (dec n) new-x new-y)
+      (vein (dec n) s new-x new-y)
       (q/pop-matrix)))))
 
-; TODO: Add curves to stem
-;       Leaves should be a bit curvier
-;       Add randomization to vertices
+; TODO: Leaves should be a bit curvier
 (defn leaf [s c x y]
-  (let [stem-length       (* s 40)
+  (let [petiole-length     (* s 40)
+        curve-dir          ([-1 1] (rand-int 2))
+        petiole-dx1        (* s curve-dir (q/random 40))
+        petiole-dx2        (* s curve-dir (q/random 40))
         unscaled-vertices [[0 20 -50 30 -50 30]
                            [-50 30 -100 40 -100 20]
                            [-100 20 -100 0 -90 -10]
@@ -44,11 +45,15 @@
     (q/translate x y)
     (q/stroke-weight 3)
     (q/stroke 139 119 101)
-    (q/line 0 0 0 (- stem-length))
+    (q/curve petiole-dx1 0
+             0 0
+             0 (- petiole-length)
+             petiole-dx2 0)
+;    (q/line 0 0 0 (- petiole-length))
 
-    (q/stroke-weight 2)
+    (q/stroke-weight 1)
     (apply q/stroke (map #(* 0.5 %) c))
-    (q/translate 0 (- stem-length))
+    (q/translate 0 (- petiole-length))
     (q/begin-shape)
     (apply q/fill c)
     (q/vertex 0 0)
@@ -57,9 +62,8 @@
     (q/end-shape :close)
 
     (doseq [[vein-x vein-y] vein-vertices]
-      (vein 2 vein-x vein-y))
-    (q/pop-matrix)
-    ))
+      (vein 2 s vein-x vein-y))
+    (q/pop-matrix)))
 
 (defn branch [n x y]
   (let [leaf-count n
