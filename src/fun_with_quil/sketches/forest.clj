@@ -6,7 +6,8 @@
   (for [_ (range n)]
     {:c (cs (rand-int (count cs)))
      :x (q/random -3000 3000)
-     :y (q/random -3000 0)}))
+     :y (q/random -3000 0)
+     :z 0}))
 
 (defn setup []
   (let [n  20
@@ -21,14 +22,19 @@
     (q/no-loop)
     (make-forest n cs)))
 
-(defn tapered-spiral-fn [t p]
+(defn upright-fn [t p]
   [(* (+ (* t 10) (* 12 (q/sqrt t) (q/cos p))) (q/cos t))
    (* (+ (* t 10) (* 12 (q/sqrt t) (q/cos p))) (q/sin t))
    (+ (* 50 t) (* 12 (q/sqrt t) (q/sin p)))])
 
-(defn tapered-spiral [{:keys [x y c]}]
+(defn reflected-fn [t p]
+  [(* (+ (* t 10) (* 12 (q/sqrt t) (q/cos p))) (q/cos t))
+   (* (+ (* t 10) (* 12 (q/sqrt t) (q/cos p))) (q/sin t))
+   (+ (* -50 t) (* 12 (q/sqrt t) (q/sin p)))])
+
+(defn spiral [{:keys [x y z c]} f]
   (q/push-matrix)
-  (q/translate x y 0)
+  (q/translate x y z)
   (apply q/fill c)
   (let [dt (/ q/TWO-PI 50)
         dp (/ q/TWO-PI 20)]
@@ -39,9 +45,18 @@
                        [(+ t dt) p]
                        [(+ t dt) (+ p dp)]
                        [t (+ p dp)]]]
-          (apply q/vertex (apply tapered-spiral-fn angle)))
+          (apply q/vertex (apply f angle)))
         (q/end-shape))))
   (q/pop-matrix))
+
+(defn upright-spiral [s]
+  (spiral s upright-fn))
+
+(defn reflected-spiral [s]
+  (let [s' (-> s
+             (update-in [:z] + 4000)
+             (update-in [:c] (fn [c] (map #(* 0.25 %) c))))]
+    (spiral s' reflected-fn)))
 
 (defn draw [forest]
   (let [w  (q/width)
@@ -56,7 +71,8 @@
                    0 2000 -1000)
 
     (doseq [spiral forest]
-      (tapered-spiral spiral))
+      (upright-spiral spiral)
+      (reflected-spiral spiral))
     (q/save "forest.png")))
 
 (q/defsketch forest
