@@ -2,17 +2,31 @@
   (:require [quil.core :as q :include-macros true]
             [quil.middleware :as m]))
 
+(defn make-forest [n cs]
+  (for [_ (range n)]
+    {:c (cs (rand-int (count cs)))
+     :x (q/random -3000 3000)
+     :y (q/random -3000 0)}))
+
 (defn setup []
-  (q/smooth)
-  (q/no-stroke)
-  (q/no-loop))
+  (let [n  20
+        cs [[255 127 0]
+            [245 222 179]
+            [255 255 0]
+            [0 255 0]
+            [135 206 250]
+            [127 0 255]]]
+    (q/smooth)
+    (q/no-stroke)
+    (q/no-loop)
+    (make-forest n cs)))
 
 (defn tapered-spiral-fn [t p]
   [(* (+ (* t 10) (* 12 (q/sqrt t) (q/cos p))) (q/cos t))
    (* (+ (* t 10) (* 12 (q/sqrt t) (q/cos p))) (q/sin t))
    (+ (* 50 t) (* 12 (q/sqrt t) (q/sin p)))])
 
-(defn tapered-spiral [x y c]
+(defn tapered-spiral [{:keys [x y c]}]
   (q/push-matrix)
   (q/translate x y 0)
     (apply q/fill c)
@@ -30,15 +44,8 @@
   (q/pop-matrix))
 
 (defn draw [forest]
-  (let [fc (q/frame-count)
-        w  (q/width)
-        h  (q/height)
-        cs [[255 127 0]
-            [245 222 179]
-            [255 255 0]
-            [0 255 0]
-            [135 206 250]
-            [127 0 255]]]
+  (let [w  (q/width)
+        h  (q/height)]
     (q/background 0)
     (q/translate (* 0.5 w) (* 0.5 h))
 
@@ -48,14 +55,9 @@
     (q/point-light 168 168 168
                    0 2000 -1000)
 
-    (dotimes [_ 20]
-      (let [c (cs (rand-int (count cs)))
-            x (q/random -3000 3000)
-            y (q/random -3000 0)]
-        (tapered-spiral x y c)))
-    (q/save "forest.png")
-    )
-  )
+    (doseq [spiral forest]
+      (tapered-spiral spiral))
+    (q/save "forest.png")))
 
 (q/defsketch forest
   :title      "forest"
