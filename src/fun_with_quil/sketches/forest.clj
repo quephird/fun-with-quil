@@ -29,18 +29,18 @@
 (defn tapered-spiral [{:keys [x y c]}]
   (q/push-matrix)
   (q/translate x y 0)
-    (apply q/fill c)
-    (let [dt (/ q/TWO-PI 50)
-          dp (/ q/TWO-PI 20)]
-      (doseq [t (range 0 (* 6 q/TWO-PI) dt)]
-        (doseq [p (range 0 q/TWO-PI dp)]
-          (q/begin-shape :quads)
-          (doseq [angle [[t p]
-                         [(+ t dt) p]
-                         [(+ t dt) (+ p dp)]
-                         [t (+ p dp)]]]
-            (apply q/vertex (apply tapered-spiral-fn angle)))
-          (q/end-shape))))
+  (apply q/fill c)
+  (let [dt (/ q/TWO-PI 50)
+        dp (/ q/TWO-PI 20)]
+    (doseq [t (range 0 (* 6 q/TWO-PI) dt)]
+      (doseq [p (range 0 q/TWO-PI dp)]
+        (q/begin-shape :quads)
+        (doseq [angle [[t p]
+                       [(+ t dt) p]
+                       [(+ t dt) (+ p dp)]
+                       [t (+ p dp)]]]
+          (apply q/vertex (apply tapered-spiral-fn angle)))
+        (q/end-shape))))
   (q/pop-matrix))
 
 (defn draw [forest]
