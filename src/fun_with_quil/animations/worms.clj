@@ -6,10 +6,12 @@
   (for [i (range n)]
     {:x (q/random max-x)
      :y (q/random max-y)
-     :r (q/random 200 300)
+     :dx (q/random -10 10)
+     :dy (q/random -10 10)
+     :r (q/random 100 200)
      :h (q/random 0 40)
      :dθ (q/random 0 q/TWO-PI)
-     :sw (q/random 10 80)
+     :sw (q/random 10 60)
      :θ (q/random q/HALF-PI q/PI)}))
 
 (defn setup []
@@ -17,9 +19,17 @@
         h  (q/height)]
     (q/smooth)
     (q/color-mode :hsb)
-    (make-worms w h 40)))
+    {:worms (make-worms w h 70) :w w :h h}))
 
-(defn draw [worms]
+(defn update [{worms :worms w :w h :h :as state}]
+  (let  [new-worms (->> worms
+                     (map (fn [{dx :dx :as worm}] (update-in worm [:x] + dx)))
+                     (map (fn [{dy :dy :as worm}] (update-in worm [:y] + dy)))
+                     (map (fn [{x :x dx :dx :as worm}] (assoc-in worm [:dx] (if (or (>= x w) (<= x 0)) (- dx) dx))))
+                     (map (fn [{y :y dy :dy :as worm}] (assoc-in worm [:dy] (if (or (>= y h) (<= y 0)) (- dy) dy)))))]
+    (assoc-in state [:worms] new-worms)))
+
+(defn draw [{worms :worms :as state}]
   (let [fc (q/frame-count)
         dϕ (* fc 0.1)]
     (q/background 0)
@@ -33,7 +43,8 @@
 
 (q/defsketch worms
   :title "worms"
+  :size [1200 800]
   :setup setup
+  :update update
   :draw draw
-  :size [1440 800]
   :middleware [m/fun-mode])
