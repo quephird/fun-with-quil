@@ -13,7 +13,6 @@
   (q/smooth)
   (q/color-mode :hsb)
   (q/no-stroke)
-;  (q/no-loop)
   [(make-starburst)])
 
 (defn update [starbursts]
@@ -23,9 +22,7 @@
       (map (fn [sb] (-> sb
                       (update-in [:y] + 20)
                       (update-in [:r] + 10))))
-      (filter (fn [{y :y}] (< y 2000))))
-    )
-  )
+      (filter (fn [{y :y}] (< y 2000))))))
 
 (defn draw [starbursts]
   (let [fc (q/frame-count)
@@ -47,16 +44,13 @@
         (q/pop-matrix)
         (q/rotate-z (/ q/PI 12))
         )
-      (q/pop-matrix)
-      )
-    )
-  )
+      (q/pop-matrix))))
 
 (q/defsketch Hello
   :size       [1440 800]
   :title      "stargate"
+  :renderer   :p3d
   :setup      setup
   :update     update
   :draw       draw
-  :renderer   :p3d
   :middleware [m/fun-mode])
