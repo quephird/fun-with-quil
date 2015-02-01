@@ -39,10 +39,11 @@
           (q/ellipse x y petal-w petal-w)))
       (q/pop-matrix))))
 
-(sketch
+(q/sketch
   :title      "pulsating flowers"
   :size       [1400 800]
   :setup      setup
   :draw       draw
   :update     update
   :middleware [m/fun-mode])
+
