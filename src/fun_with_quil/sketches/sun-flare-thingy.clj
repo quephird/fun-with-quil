@@ -15,10 +15,10 @@
 
 (defn generate-starbursts [w h]
   (dotimes [_ 150]
-    (let [x (random w)
-          y (+ (random (* h 0.75)) (* h 0.12))
-          d (random (* 0.1 h))
-          gc (create-graphics (* 0.25 h) (* 0.25 h))]
+    (let [x (q/random w)
+          y (+ (q/random (* h 0.75)) (* h 0.12))
+          d (q/random (* 0.1 h))
+          gc (q/create-graphics (* 0.25 h) (* 0.25 h))]
       (doto gc
         (.background 0 0 0 0)
         (.beginDraw)
