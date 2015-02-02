@@ -3,7 +3,7 @@
             [quil.middleware :as m]))
 
 (defn make-starburst []
-  {:x (q/random -500 500)
+  {:x (q/random -1000 1000)
    :y -3000
    :z (if (zero? (rand-int 2)) -100 100)
    :r 10
@@ -46,7 +46,7 @@
         )
       (q/pop-matrix))))
 
-(q/defsketch Hello
+(q/defsketch stargate
   :size       [1440 800]
   :title      "stargate"
   :renderer   :p3d
