@@ -15,9 +15,9 @@
 
 (defn generate-starbursts [w h]
   (dotimes [_ 150]
-    (let [x (q/random w)
-          y (+ (q/random (* h 0.75)) (* h 0.12))
-          d (q/random (* 0.1 h))
+    (let [x  (q/random w)
+          y  (+ (q/random (* h 0.75)) (* h 0.12))
+          d  (q/random (* 0.1 h))
           gc (q/create-graphics (* 0.25 h) (* 0.25 h))]
       (doto gc
         (.background 0 0 0 0)
@@ -30,7 +30,7 @@
         (.ellipse 100 100 (* d 0.5) (* d 0.5))
         (.filter PConstants/BLUR 4)
         (.endDraw))
-      (image gc (- x 100) (- y 100)))))
+      (q/image gc (- x 100) (- y 100)))))
 
 (defn setup []
   (q/no-stroke)
@@ -49,7 +49,7 @@
                    [w [250 247 212]]]]
     (generate-background xs-and-cs h)
     (generate-starbursts w h)
-    (save "sun-flare-thingy.png")))
+    (q/save "sun-flare-thingy.png")))
 
 (q/defsketch sun-flare-thingy
   :title "sun-flare-thingy"
