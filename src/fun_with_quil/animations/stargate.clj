@@ -47,7 +47,8 @@
       (q/pop-matrix))))
 
 (q/defsketch stargate
-  :size       [1440 800]
+  :size       :fullscreen
+  :features  [:present]
   :title      "stargate"
   :renderer   :p3d
   :setup      setup
