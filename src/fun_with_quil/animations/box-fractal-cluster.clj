@@ -7,13 +7,11 @@
   (q/fill 0)
   (q/color-mode :hsb))
 
-; TODO: Need better names for angular vars, x and y
-;       Need to fix color problem
-(defn cross [s n]
+; TODO: Need to fix color problem
+(defn cross-iter [s n max-n]
   (let [fc (q/frame-count)
         θ  (* 1.3 fc (if (even? n) -1 1))
-        h  (* n 32)]
-    (q/stroke s 255 255)
+        h  (mod (+ fc (q/map-range n 0 max-n 0 255)) 255)]
     (doseq [[x y] [[(- q/HALF-PI) 0]
                    [q/HALF-PI 0]
                    [0 0]
@@ -24,6 +22,7 @@
       (q/rotate-x x)
       (q/rotate-y y)
       (q/translate 0 0 s)
+      (q/stroke h 255 255)
       (q/box s)
       (if (and (not (zero? n)))
         (do
@@ -32,9 +31,12 @@
           ; TODO: Need to relate computation of translation below
           ;       with next scale when recursing.
           (q/translate 0 0 (* 1.25 s))
-          (cross (* 0.5 s) (dec n))
+          (cross-iter (* 0.5 s) (dec n) max-n)
           (q/pop-matrix)))
       (q/pop-matrix))))
+
+(defn cross [s n]
+  (cross-iter s n n))
 
 (defn draw []
   (let [fc (q/frame-count)
@@ -52,4 +54,4 @@
   :setup setup
   :draw draw
   :renderer :p3d
-  :size [800 800])
+  :size [1000 1000])
