@@ -7,29 +7,31 @@
   (q/fill 0)
   (q/color-mode :hsb))
 
-; TODO: Need to fix color problem
 (defn cross-iter [s n max-n]
   (let [fc (q/frame-count)
-        θ  (* 1.3 fc (if (even? n) -1 1))
+        ψ  (* 1.3 fc (if (even? n) -1 1))
         h  (mod (+ fc (q/map-range n 0 max-n 0 255)) 255)]
-    (doseq [[x y] [[(- q/HALF-PI) 0]
+    (doseq [[θ ϕ] [[(- q/HALF-PI) 0]
                    [q/HALF-PI 0]
                    [0 0]
                    [0 q/HALF-PI]
                    [0 q/PI]
                    [0 (- q/HALF-PI)]]]
       (q/push-matrix)
-      (q/rotate-x x)
-      (q/rotate-y y)
+      (q/rotate-x θ)
+      (q/rotate-y ϕ)
       (q/translate 0 0 s)
       (q/stroke h 255 255)
       (q/box s)
-      (if (and (not (zero? n)))
+      ; This if allows for recursion when:
+      ;
+      ; * we're not at the last level, and
+      ; * only for all six cubes at the innermost level
+      (if (and (not= 0 n)
+               (not (and (= q/PI ϕ) (= n (dec max-n)))))
         (do
           (q/push-matrix)
-          (q/rotate-z (q/radians θ))
-          ; TODO: Need to relate computation of translation below
-          ;       with next scale when recursing.
+          (q/rotate-z (q/radians ψ))
           (q/translate 0 0 (* 1.25 s))
           (cross-iter (* 0.5 s) (dec n) max-n)
           (q/pop-matrix)))
