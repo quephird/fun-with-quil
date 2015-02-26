@@ -46,11 +46,7 @@
           (q/stroke (mod fc 255) 255 255)
           (doseq [φ (range 0 360 20)]
             (q/line 0 0 0 (* 250 (q/cos (q/radians φ))) (* 250 (q/sin (q/radians φ))) dz))
-          (q/pop-matrix)
-        )
-      )
-    )
-  )
+          (q/pop-matrix)))))
 
 (q/defsketch disco-dandelion
   :size [800 800]
